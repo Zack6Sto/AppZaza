@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/ic_launcher_background"
+        android:text="Custom Dialog"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        />
+
+    <TextView
+        android:id="@+id/tv_alert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="This is a custom dialog message"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="40dp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DEDEDE"
+        />
+
+    <Button
+        android:id="@+id/btDismissCustomDialog"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textColor="@color/black"
+        android:background="?selectableItemBackground"
+        android:text="Dismiss"
+        />
+
+</LinearLayout>
