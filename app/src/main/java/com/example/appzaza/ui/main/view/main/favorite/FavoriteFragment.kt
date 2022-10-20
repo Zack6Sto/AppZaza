@@ -7,11 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appzaza.base.BaseFragment
 import com.example.appzaza.data.api.ApiHelperImpl
 import com.example.appzaza.data.api.RetrofitBuilder
 import com.example.appzaza.data.model.ConfigData
@@ -29,28 +29,19 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 private const val TAG = "FavoriteFragment"
-@ExperimentalCoroutinesApi
-class FavoriteFragment : Fragment() {
 
-    private var _binding: FragmentFavoriteBinding? = null
-    private val binding get() = _binding!!
+@ExperimentalCoroutinesApi
+class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
+
     lateinit var session: SharedPreference
     private var adapter = MainAdapter(arrayListOf())
     private lateinit var mainViewModel: MainViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        // Inflate the layout for this fragment
-        _binding = FragmentFavoriteBinding.inflate(inflater, container, false)
 
-        initView()
+    override val bindLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragmentFavoriteBinding
+        get() = FragmentFavoriteBinding::inflate
 
-        return binding.root
-    }
-
-    private fun initView() {
+    override fun prepareView(savedInstanceState: Bundle?) {
         setDataUserSharedPreference()
         setUI()
         setViewModel()
@@ -60,9 +51,9 @@ class FavoriteFragment : Fragment() {
     }
 
     private fun setLoadConfig() {
-            lifecycleScope.launch {
-                mainViewModel.userIntent.send(MainIntent.FetchConfigApp)
-            }
+        lifecycleScope.launch {
+            mainViewModel.userIntent.send(MainIntent.FetchConfigApp)
+        }
     }
 
     private fun setDataUserSharedPreference() {
@@ -101,30 +92,30 @@ class FavoriteFragment : Fragment() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             mainViewModel.state.collect {
-                when(it){
-                    is MainState.Idle ->{
+                when (it) {
+                    is MainState.Idle -> {
 
                     }
-                    is MainState.Loading ->{
+                    is MainState.Loading -> {
                         renderShowProgressBar()
-                        Log.e(TAG,"observeViewModel Loading")
+                        Log.e(TAG, "observeViewModel Loading")
                     }
 
-                    is MainState.Users ->{
+                    is MainState.Users -> {
                         renderList(it.user)
-                        Log.e(TAG,"observeViewModel Users")
+                        Log.e(TAG, "observeViewModel Users")
                     }
 
-                    is MainState.Error ->{
+                    is MainState.Error -> {
                         renderError()
                         Toast.makeText(requireContext(), it.error, Toast.LENGTH_SHORT).show()
-                        Log.e(TAG,"observeViewModel Error")
+                        Log.e(TAG, "observeViewModel Error")
                     }
                     is MainState.DataOnBoarding -> TODO()
                     is MainState.ConfigApp -> {
 //                        renderDataConfig(listOf(it.configApp))
                         renderDataConfig(it.configApp)
-                        Log.e(TAG,"observeViewModel ConfigApp")
+                        Log.e(TAG, "observeViewModel ConfigApp")
                     }
                     is MainState.Markets -> TODO()
                 }
@@ -157,7 +148,7 @@ class FavoriteFragment : Fragment() {
         binding.buttonFetchUser.visibility = View.VISIBLE
 //        binding.userName.text = config[0]?.name
         binding.userName.text = config.toString()
-        Log.e(TAG,"renderDataConfig: $config")
+        Log.e(TAG, "renderDataConfig: $config")
     }
 
     private fun setupClicks() {
@@ -172,22 +163,12 @@ class FavoriteFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-
-        adapter.clearData()
-        Log.e(TAG,"observeViewModel onDestroyView")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.e(TAG,"observeViewModel onResume")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.e(TAG,"observeViewModel onPause")
-    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//
+//        adapter.clearData()
+//        Log.e(TAG,"observeViewModel onDestroyView")
+//    }
 
 }

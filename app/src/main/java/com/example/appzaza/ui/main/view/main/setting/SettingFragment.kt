@@ -3,12 +3,11 @@ package com.example.appzaza.ui.main.view.main.setting
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
+import com.example.appzaza.base.BaseFragment
 import com.example.appzaza.data.api.ApiHelperImpl
 import com.example.appzaza.data.api.RetrofitBuilder
 import com.example.appzaza.data.sharedpreferences.SharedPreference
@@ -23,29 +22,17 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 private const val TAG = "SettingFragment"
-class SettingFragment : Fragment() {
+class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
-    private var _binding: FragmentSettingBinding? = null
-    private val binding get() = _binding!!
     lateinit var session: SharedPreference
     private var adapter = MainAdapter(arrayListOf())
     private lateinit var mainViewModel: MainViewModel
 
-//    val TAG = "SettingFragment"
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        // Inflate the layout for this fragment
-        _binding = FragmentSettingBinding.inflate(inflater, container, false)
+    override val bindLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragmentSettingBinding
+        get() = FragmentSettingBinding::inflate
 
-        initView()
-
-        return binding.root
-    }
-
-    private fun initView() {
+    override fun prepareView(savedInstanceState: Bundle?) {
         setDataUserSharedPreference()
 //        setUI()
         setViewModel()
@@ -133,17 +120,6 @@ class SettingFragment : Fragment() {
         binding.btnLogout.setOnClickListener {
             session.logoutUser()
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        Log.e(TAG,"observeViewModel onDestroyView")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.e(TAG,"observeViewModel onResume")
     }
 //
 //    @SuppressLint("NotifyDataSetChanged")

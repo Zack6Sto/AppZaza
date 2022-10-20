@@ -3,21 +3,20 @@ package com.example.appzaza.ui.main.view.splash
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.example.appzaza.R
+import com.example.appzaza.base.BaseActivity
 import com.example.appzaza.data.api.ApiHelperImpl
 import com.example.appzaza.data.api.RetrofitBuilder
 import com.example.appzaza.data.model.OnBoardingData
 import com.example.appzaza.databinding.ActivitySplashBinding
 import com.example.appzaza.ui.main.adapter.OnBoardingViewPagerAdapter
 import com.example.appzaza.ui.main.intent.MainIntent
-import com.example.appzaza.ui.main.view.MainActivity
 import com.example.appzaza.ui.main.view.login.LoginActivity
 import com.example.appzaza.ui.main.viewmodel.MainViewModel
 import com.example.appzaza.ui.main.viewstate.MainState
@@ -29,20 +28,20 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("CustomSplashScreen")
 @ExperimentalCoroutinesApi
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var binding: ActivitySplashBinding
     private lateinit var sharePreferences: SharedPreferences
 
     var onBoardingViewPagerAdapter: OnBoardingViewPagerAdapter? =null
     var onBoardingViewPager: ViewPager? = null
     var position = 0
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySplashBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+
+    override val bindLayout: (LayoutInflater) -> ActivitySplashBinding
+        get() = ActivitySplashBinding::inflate
+
+    override fun prepareView(savedInstanceState: Bundle?) {
 
         if (restorePrefData()){
             val i = Intent(applicationContext,LoginActivity::class.java)

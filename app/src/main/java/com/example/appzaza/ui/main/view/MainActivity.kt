@@ -1,12 +1,12 @@
 package com.example.appzaza.ui.main.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import com.example.appzaza.R
+import com.example.appzaza.base.BaseActivity
 import com.example.appzaza.databinding.ActivityMainBinding
 import com.example.appzaza.ui.main.view.main.favorite.FavoriteFragment
 import com.example.appzaza.ui.main.view.main.home.HomeFragment
@@ -16,19 +16,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 @ExperimentalCoroutinesApi
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var binding: ActivityMainBinding
 
     val TAG = "MainActivity"
 
-    @SuppressLint("SetTextI18n")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override val bindLayout: (LayoutInflater) -> ActivityMainBinding
+        get() = ActivityMainBinding::inflate
 
+    override fun prepareView(savedInstanceState: Bundle?) {
         setUIFragment()
     }
 

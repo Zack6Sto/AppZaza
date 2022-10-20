@@ -4,10 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
+import com.example.appzaza.base.BaseActivity
 import com.example.appzaza.data.api.ApiHelperImpl
 import com.example.appzaza.data.api.RetrofitBuilder
 import com.example.appzaza.data.sharedpreferences.SharedPreference
@@ -24,20 +25,19 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var binding: ActivityLoginBinding
     private lateinit var sharedPref: SharedPreference
     private val loadingDialog = LoadingDialog(this)
 
     val TAG = "LoginActivity"
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
+    override val bindLayout: (LayoutInflater) -> ActivityLoginBinding
+        get() = ActivityLoginBinding::inflate
+
+    override fun prepareView(savedInstanceState: Bundle?) {
         setViewModel()
         initLoadConfig()
         initSession()
@@ -97,22 +97,22 @@ class LoginActivity : AppCompatActivity() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             mainViewModel.state.collect {
-                when(it){
-                    is MainState.Idle ->{
+                when (it) {
+                    is MainState.Idle -> {
 
                     }
-                    is MainState.Loading ->{
+                    is MainState.Loading -> {
                         loadingDialog.startLoading()
-                        Log.e(TAG,"observeViewModel Loading")
+                        Log.e(TAG, "observeViewModel Loading")
                     }
 
-                    is MainState.Users ->{
+                    is MainState.Users -> {
 
                     }
 
-                    is MainState.Error ->{
+                    is MainState.Error -> {
                         Toast.makeText(this@LoginActivity, it.error, Toast.LENGTH_SHORT).show()
-                        Log.e(TAG,"observeViewModel Error:"+it.error.toString())
+                        Log.e(TAG, "observeViewModel Error:" + it.error.toString())
                     }
                     is MainState.DataOnBoarding -> {
 
@@ -122,10 +122,10 @@ class LoginActivity : AppCompatActivity() {
 //                        binding.tvNameApp.text = it.configApp[0]!!.AppName
                         binding.tvNameApp.text = it.configApp?.AppName
 //                        binding.tvNameApp.text = it.configApp.body()?.AppName
-                        Log.e(TAG,"observeViewModel ConfigApp:"+it.configApp.toString())
+                        Log.e(TAG, "observeViewModel ConfigApp:" + it.configApp.toString())
                     }
                     is MainState.Markets -> {
-                        Log.e(TAG,"observeViewModel Markets")
+                        Log.e(TAG, "observeViewModel Markets")
                     }
                 }
             }
@@ -146,23 +146,23 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    private fun checkInputLogin(){
+    private fun checkInputLogin() {
         val username = binding.etUsername.text.toString()
         val password = binding.etPassword.text.toString()
 
-        if (username.trim().isNotEmpty() && password.trim().isNotEmpty()){
+        if (username.trim().isNotEmpty() && password.trim().isNotEmpty()) {
             lifecycleScope.launch {
                 mainViewModel.userIntent.send(MainIntent.FetchConfigApp)
             }
-            sharedPref.createLoginSession(username,password)
+            sharedPref.createLoginSession(username, password)
             val i = Intent(applicationContext, MainActivity::class.java)
             startActivity(i)
             finish()
-        }else if (username.trim().isEmpty() && password.trim().isNotEmpty()){
+        } else if (username.trim().isEmpty() && password.trim().isNotEmpty()) {
             loadingDialog.startDialogAlert("Login Failed...\n Please enter username")
-        }else if (username.trim().isNotEmpty() && password.trim().isEmpty()){
+        } else if (username.trim().isNotEmpty() && password.trim().isEmpty()) {
             loadingDialog.startDialogAlert("Login Failed...\n Please enter password")
-        }else{
+        } else {
             loadingDialog.startDialogAlert("Login Failed...\n Please enter both credential")
         }
     }
@@ -170,7 +170,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun initSession() {
         sharedPref = SharedPreference(applicationContext)
-        if (sharedPref.isLogIn()){
+        if (sharedPref.isLogIn()) {
             val i = Intent(applicationContext, MainActivity::class.java)
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             i.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
