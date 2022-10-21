@@ -2,20 +2,20 @@ package com.example.appzaza.util.dialog
 
 import android.app.Activity
 import androidx.appcompat.app.AlertDialog
-import com.example.appzaza.R
-import kotlinx.android.synthetic.main.dialog_alert.view.*
-import kotlinx.android.synthetic.main.dialog_custom_layout.view.tv_alert
+import com.example.appzaza.databinding.DialogAlertBinding
+import com.example.appzaza.databinding.LoadingItemBinding
 
 class LoadingDialog(private val activity: Activity) {
     private lateinit var isDialog: AlertDialog
+    private lateinit var binding: DialogAlertBinding
+    private lateinit var bindingLoading: LoadingItemBinding
 
     fun startLoading(){
         /**setView*/
-        val inflater = activity.layoutInflater
-        val dialogView = inflater.inflate(R.layout.loading_item,null)
+        bindingLoading = LoadingItemBinding.inflate(activity.layoutInflater)
         /**setDialog*/
         val builder = AlertDialog.Builder(activity)
-        builder.setView(dialogView)
+        builder.setView(bindingLoading.root)
         builder.setCancelable(false)
         isDialog = builder.create()
         isDialog.show()
@@ -27,20 +27,17 @@ class LoadingDialog(private val activity: Activity) {
 
     /**dialog alert*/
     fun startDialogAlert(msg: String){
-        val inflater = activity.layoutInflater
-        val dialogView = inflater.inflate(R.layout.dialog_alert,null)
-
+        binding = DialogAlertBinding.inflate(activity.layoutInflater)
         val builder = AlertDialog.Builder(activity)
-        builder.setView(dialogView)
+        builder.setView(binding.root)
         builder.setCancelable(false)
 
-
-        dialogView.tv_alert.text = msg
+        binding.tvAlert.text = msg
 
         isDialog = builder.create()
         isDialog.show()
 
-        dialogView.btn_close.setOnClickListener {
+        binding.btnClose.setOnClickListener {
             isDialog.dismiss()
         }
 

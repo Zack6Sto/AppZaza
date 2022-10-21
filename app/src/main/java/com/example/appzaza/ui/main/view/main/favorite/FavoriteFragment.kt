@@ -35,6 +35,9 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
 
     lateinit var session: SharedPreference
     private var adapter = MainAdapter(arrayListOf())
+//    private val adapter : ListsUserAdapter by lazy {
+//        ListsUserAdapter()
+//}
     private lateinit var mainViewModel: MainViewModel
 
 

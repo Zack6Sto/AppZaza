@@ -25,7 +25,7 @@ private const val TAG = "SettingFragment"
 class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
     lateinit var session: SharedPreference
-    private var adapter = MainAdapter(arrayListOf())
+//    private var adapter = MainAdapter(arrayListOf())
     private lateinit var mainViewModel: MainViewModel
 
 
