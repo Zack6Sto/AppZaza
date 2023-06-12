@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardCornerRadius="@dimen/margin_10"
+    android:layout_marginStart="@dimen/margin_5"
+    android:layout_marginTop="@dimen/margin_5">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvHomeMenuBadge"
+                android:layout_width="@dimen/margin_20"
+                android:layout_height="@dimen/margin_20"
+
+                android:background="@drawable/circle_red"
+                android:backgroundTint="@color/red"
+                android:elevation="@dimen/margin_8"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:visibility="visible"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                app:autoSizeMaxTextSize="@dimen/FontSizeM"
+                app:autoSizeMinTextSize="@dimen/FontSizeSS"
+                app:autoSizeTextType="uniform"
+                android:includeFontPadding="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="555555555" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvHomeMenuBadgeRemove"
+                android:layout_width="@dimen/margin_20"
+                android:layout_height="@dimen/margin_20"
+                android:background="@drawable/ic_circle_remove"
+                android:elevation="@dimen/margin_8"
+                android:backgroundTint="@color/red"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                app:autoSizeMaxTextSize="@dimen/FontSizeM"
+                app:autoSizeMinTextSize="@dimen/FontSizeSS"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgHomeMenu"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="@dimen/margin_8"
+                android:layout_marginTop="@dimen/margin_8"
+                android:layout_marginEnd="@dimen/margin_8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_launcher_background" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvHomeMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_8"
+            android:layout_marginTop="@dimen/margin_8"
+            android:layout_marginEnd="@dimen/margin_8"
+            android:layout_marginBottom="@dimen/margin_8"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text=""
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

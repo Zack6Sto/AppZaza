@@ -9,16 +9,18 @@ import com.example.appzaza.databinding.ItemLayoutBinding
 import com.example.appzaza.util.loadImage
 
 class MainAdapter(
-    private val users: ArrayList<User>
+    private val users: ArrayList<User>,
+    private var onItemSelect: ((users: User) -> Unit)? = null
 ) : RecyclerView.Adapter<MainAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        //        init {
+//        init {
 //            itemView.setOnClickListener {
 //                listener.onItemClick(adapterPosition)
 //            }
 //        }
+
         fun bind(user: User) {
             binding.textViewUserName.text = user.name
             binding.textViewUserEmail.text = user.email
@@ -33,8 +35,13 @@ class MainAdapter(
 
     override fun getItemCount(): Int = users.size
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(users[position])
+
+        holder.itemView.setOnClickListener {
+            this.onItemSelect?.invoke(users[position])
+        }
+    }
 
 
     fun addData(list: List<User>) {
@@ -45,6 +52,10 @@ class MainAdapter(
     fun clearData() {
         users.clear()
         Log.e("MainAdapter", "clearData")
+    }
+
+    fun setOnItemSelect(onItemSelect: (users: User) -> Unit) {
+        this.onItemSelect = onItemSelect
     }
 
 }

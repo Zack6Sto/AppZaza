@@ -1,5 +1,6 @@
 package com.example.appzaza.ui.main.view.main.setting
 
+import android.R
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,26 +8,30 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appzaza.base.BaseFragment
 import com.example.appzaza.data.api.ApiHelperImpl
 import com.example.appzaza.data.api.RetrofitBuilder
+import com.example.appzaza.data.model.MenuModel
 import com.example.appzaza.data.sharedpreferences.SharedPreference
 import com.example.appzaza.databinding.FragmentSettingBinding
-import com.example.appzaza.ui.main.adapter.MainAdapter
 import com.example.appzaza.ui.main.viewmodel.MainViewModel
 import com.example.appzaza.ui.main.viewstate.MainState
 import com.example.appzaza.util.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-@ExperimentalCoroutinesApi
+
 private const val TAG = "SettingFragment"
+@ExperimentalCoroutinesApi
 class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
     lateinit var session: SharedPreference
 //    private var adapter = MainAdapter(arrayListOf())
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var settingAdapter: SettingAdapter
+    private lateinit var menuModel: ArrayList<MenuModel>
+//    private val settingAdapter by lazy { SettingAdapter(arrayListOf()) }
 
 
     override val bindLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragmentSettingBinding
@@ -34,7 +39,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
     override fun prepareView(savedInstanceState: Bundle?) {
         setDataUserSharedPreference()
-//        setUI()
+        setUI()
         setViewModel()
         observeViewModel()
         setOnClicks()
@@ -48,11 +53,11 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
         val name: String = user[SharedPreference.KEY_NAME]!!
         val pass: String = user[SharedPreference.KEY_PASS]!!
 
-//        binding.userName.text = "Name: $name"
+        binding.userName.text = name
 //        binding.password.text ="Pass: $pass"
     }
 //
-//    private fun setUI() {
+    private fun setUI() {
 //        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 //        binding.recyclerView.run {
 //            addItemDecoration(
@@ -63,8 +68,28 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 //            )
 //        }
 //        binding.recyclerView.adapter = adapter
-//    }
-//
+    val dataMenu: MutableList<MenuModel> = ArrayList()
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.logo_boon,"menu 1"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.luffy,"menu 2"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.solo,"menu 3"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.solo,"menu 4"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.luffy,"menu 5"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.logo_boon,"menu 6"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.logo_boon,"menu 7"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.luffy,"menu 8"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.solo,"menu 9"))
+
+
+    binding.apply {
+            rcvSetting.apply {
+                layoutManager = LinearLayoutManager(context,LinearLayoutManager.HORIZONTAL,false)
+//                layoutManager = GridLayoutManager(context, 2)
+                settingAdapter = SettingAdapter(dataMenu as ArrayList<MenuModel>)
+                adapter = settingAdapter
+            }
+        }
+    }
+
     private fun setViewModel() {
         mainViewModel = ViewModelProviders.of(
             this,

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
+import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import com.example.appzaza.base.BaseActivity
@@ -19,17 +20,23 @@ import com.example.appzaza.ui.main.viewmodel.MainViewModel
 import com.example.appzaza.ui.main.viewstate.MainState
 import com.example.appzaza.util.KeyboardUtil
 import com.example.appzaza.util.ViewModelFactory
+import com.example.appzaza.util.biometric.BiometricAuthListener
+import com.example.appzaza.util.biometric.BiometricUtil
 import com.example.appzaza.util.dialog.LoadingDialog
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoginActivity : BaseActivity<ActivityLoginBinding>() {
+class LoginActivity : BaseActivity<ActivityLoginBinding>(), BiometricAuthListener {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var sharedPref: SharedPreference
     private val loadingDialog = LoadingDialog(this)
+
+    private var countFailScanBio = 0
+    private var biometricPrompt: BiometricUtil? = null
+
 
     val TAG = "LoginActivity"
 
@@ -44,6 +51,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
         observeViewModel()
         setupClicks()
         hideKeyboardWhenTouch()
+        initBio()
     }
 
     override fun onDestroy() {
@@ -93,6 +101,44 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 //            }
 //        })
 //    }
+
+    private fun initBio() {
+        biometricPrompt = BiometricUtil.instance
+//        val activity = this as? AppCompatActivity
+//        val isBiometricReady = biometricPrompt?.isBiometricReadyForFaceId(this)
+//
+//
+//        if (isBiometricReady!!) {
+//            activity?.let {
+//                biometricPrompt?.showBiometricPrompt(
+//                    title = "Biometric Authentication",
+//                    subtitle = "Enter biometric credentials to proceed.",
+//                    description = "Scan your face to authenticate.",
+//                    activity = it,
+////                    listener = biometricAuthListener,
+//                    listener = this,
+//                    cryptoObject = null,
+//                    allowDeviceCredential = false
+//                )
+//            }
+//        } else {
+//            // ไม่สนับสนุนการรับรองความถูกต้องด้วยใบหน้าหรือเกิดข้อผิดพลาด
+//            Toast.makeText(this, "Face biometric authentication is not supported.", Toast.LENGTH_SHORT).show()
+//        }
+
+        val isFaceSupported = biometricPrompt?.hasFaceCapability(applicationContext)
+        if (isFaceSupported!!) {
+            // อุปกรณ์รองรับการสแกนใบหน้า
+            Toast.makeText(this, "อุปกรณ์รองรับการสแกนใบหน้า", Toast.LENGTH_SHORT).show()
+            biometricPrompt?.showFaceBiometricPrompt(this,this)
+
+        } else {
+            // อุปกรณ์ไม่รองรับการสแกนใบหน้าหรือมีความสามารถในการสแกนใบหน้าที่อ่อนแอ
+            Toast.makeText(this, "อุปกรณ์ไม่รองรับการสแกนใบหน้าหรือมีความสามารถในการสแกนใบหน้าที่อ่อนแอ", Toast.LENGTH_SHORT).show()
+        }
+
+
+    }
 
     private fun observeViewModel() {
         lifecycleScope.launch {
@@ -186,6 +232,20 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
         v.setOnTouchListener { v, _ ->
             KeyboardUtil.hideKeyboard(v)
             false
+        }
+    }
+
+    override fun onBiometricAuthenticationSuccess(result: BiometricPrompt.AuthenticationResult) {
+        Toast.makeText(this, "BiometricAuthenticationSuccess", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onBiometricAuthenticationError(errorCode: Int, errorMessage: String) {}
+
+    override fun onBiometricAuthenticationFailed() {
+        countFailScanBio++
+        if (countFailScanBio == 3) {
+            biometricPrompt?.dimissBiometric()
+            countFailScanBio = 0
         }
     }
 

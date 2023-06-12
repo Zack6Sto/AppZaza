@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -23,8 +25,8 @@ import com.example.appzaza.ui.main.intent.MainIntent
 import com.example.appzaza.ui.main.viewmodel.MainViewModel
 import com.example.appzaza.ui.main.viewstate.MainState
 import com.example.appzaza.util.ViewModelFactory
+import com.example.appzaza.util.dialog.ImageDialog
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -35,7 +37,8 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
 
     lateinit var session: SharedPreference
     private var adapter = MainAdapter(arrayListOf())
-//    private val adapter : ListsUserAdapter by lazy {
+
+    //    private val adapter : ListsUserAdapter by lazy {
 //        ListsUserAdapter()
 //}
     private lateinit var mainViewModel: MainViewModel
@@ -65,7 +68,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         val user: HashMap<String, String> = session.getUserDetails()
 
         val name: String = user[SharedPreference.KEY_NAME]!!
-        binding.userName.text = name
+//        binding.userName.text = name
     }
 
     private fun setUI() {
@@ -79,6 +82,10 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
             )
         }
         binding.recyclerView.adapter = adapter
+        adapter.setOnItemSelect {
+            val dialog = ImageDialog(it)
+            dialog.show(childFragmentManager, "imageDialog")
+        }
     }
 
     private fun setViewModel() {
@@ -150,7 +157,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         binding.progressBar.visibility = View.GONE
         binding.buttonFetchUser.visibility = View.VISIBLE
 //        binding.userName.text = config[0]?.name
-        binding.userName.text = config.toString()
+//        binding.userName.text = config.toString()
         Log.e(TAG, "renderDataConfig: $config")
     }
 
@@ -161,17 +168,8 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
             }
         }
 
-        binding.imvFav.setOnClickListener {
-            Toast.makeText(activity, "FAV", Toast.LENGTH_SHORT).show()
-        }
+//        binding.imvFav.setOnClickListener {
+//            Toast.makeText(activity, "FAV", Toast.LENGTH_SHORT).show()
+//        }
     }
-
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        _binding = null
-//
-//        adapter.clearData()
-//        Log.e(TAG,"observeViewModel onDestroyView")
-//    }
-
 }

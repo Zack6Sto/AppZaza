@@ -18,8 +18,6 @@ class Home2Fragment : BaseFragment<FragmentHome2Binding>() {
     }
 
     private fun initData() {
-        arguments?.takeIf { it.containsKey(ARG_OBJECT) }?.apply {
-            binding.text1.text = getInt(ARG_OBJECT).toString()
-        }
+
     }
 }

@@ -22,4 +22,8 @@
     <color name="line_gray">#666666</color>
 
     <color name="line_DEDEDE">#DEDEDE</color>
+
+    <color name="bg_menu_layout">#F5F5F5</color>
+    <color name="menu_font">#4A4A4A</color>
+    <color name="menu_font_tab">#9B9B9B</color>
 </resources>

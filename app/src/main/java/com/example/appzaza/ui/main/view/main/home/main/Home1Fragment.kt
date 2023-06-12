@@ -13,12 +13,12 @@ class Home1Fragment : BaseFragment<FragmentHome1Binding>() {
         get() = FragmentHome1Binding::inflate
 
     override fun prepareView(savedInstanceState: Bundle?) {
-        initData()
+//        initData()
     }
 
     private fun initData() {
-        arguments?.takeIf { it.containsKey(ARG_OBJECT) }?.apply {
-            binding.text1.text = getInt(ARG_OBJECT).toString()
-        }
+//        arguments?.takeIf { it.containsKey(ARG_OBJECT) }?.apply {
+//            binding.text1.text = getInt(ARG_OBJECT).toString()
+//        }
     }
 }
