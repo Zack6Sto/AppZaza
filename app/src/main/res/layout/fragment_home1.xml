@@ -33,6 +33,6 @@
         android:layout_height="400dp"
         android:layout_gravity="center"
         android:scaleType="centerCrop"
-        android:src="@drawable/luffy"/>
+        android:src="@drawable/setting_icon"/>
 
 </androidx.cardview.widget.CardView>

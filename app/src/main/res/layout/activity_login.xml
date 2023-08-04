@@ -78,6 +78,18 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
+        android:id="@+id/tvUrl"
+        android:text=""
+        android:textAlignment="center"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tv_versionApp"/>
+
+    <TextView
         android:id="@+id/tv_versionApp"
         android:text="v.1.0.0"
         android:textAlignment="textEnd"

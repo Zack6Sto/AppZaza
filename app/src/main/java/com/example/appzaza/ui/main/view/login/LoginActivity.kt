@@ -1,22 +1,37 @@
 package com.example.appzaza.ui.main.view.login
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import com.example.appzaza.base.BaseActivity
 import com.example.appzaza.data.api.ApiHelperImpl
 import com.example.appzaza.data.api.RetrofitBuilder
+import com.example.appzaza.data.model.ConnProperties
 import com.example.appzaza.data.sharedpreferences.SharedPreference
 import com.example.appzaza.databinding.ActivityLoginBinding
 import com.example.appzaza.ui.main.intent.MainIntent
 import com.example.appzaza.ui.main.view.MainActivity
+import com.example.appzaza.ui.main.view.termAndCondition.TermAndConditionActivity
 import com.example.appzaza.ui.main.viewmodel.MainViewModel
+import com.example.appzaza.ui.main.viewmodel.RemoteConfigViewModel
 import com.example.appzaza.ui.main.viewstate.MainState
 import com.example.appzaza.util.KeyboardUtil
 import com.example.appzaza.util.ViewModelFactory
@@ -26,16 +41,23 @@ import com.example.appzaza.util.dialog.LoadingDialog
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.concurrent.Executor
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoginActivity : BaseActivity<ActivityLoginBinding>(), BiometricAuthListener {
+class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var sharedPref: SharedPreference
     private val loadingDialog = LoadingDialog(this)
 
     private var countFailScanBio = 0
-    private var biometricPrompt: BiometricUtil? = null
+//    private var biometricPrompt: BiometricUtil? = null
+
+    private lateinit var executor: Executor
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+
+    private val remoteConfigViewModel: RemoteConfigViewModel by viewModels()
 
 
     val TAG = "LoginActivity"
@@ -45,13 +67,25 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(), BiometricAuthListene
         get() = ActivityLoginBinding::inflate
 
     override fun prepareView(savedInstanceState: Bundle?) {
-        setViewModel()
-        initLoadConfig()
-        initSession()
-        observeViewModel()
-        setupClicks()
+        val isConnected = isInternetConnected(this)
+        if (isConnected) {
+            val remoteConfigViewModel = ViewModelProvider(this)[RemoteConfigViewModel::class.java]
+            remoteConfigViewModel.loadRemoteConfigParameters()
+            remoteConfigViewModel.config.observe(this@LoginActivity) { url ->
+                binding.tvUrl.text = url.host
+                Toast.makeText(this@LoginActivity, url.host, Toast.LENGTH_SHORT).show()
+            }
+
+            setViewModel()
+            initLoadConfig()
+            initSession()
+            observeViewModel()
+            setupClicks()
+        } else {
+            loadingDialog.startDialogAlert("ไม่มีการเชื่อมต่อ")
+        }
         hideKeyboardWhenTouch()
-        initBio()
+//        initBio()
     }
 
     override fun onDestroy() {
@@ -102,43 +136,43 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(), BiometricAuthListene
 //        })
 //    }
 
-    private fun initBio() {
-        biometricPrompt = BiometricUtil.instance
-//        val activity = this as? AppCompatActivity
-//        val isBiometricReady = biometricPrompt?.isBiometricReadyForFaceId(this)
+//    private fun initBio() {
+//        biometricPrompt = BiometricUtil.instance
+////        val activity = this as? AppCompatActivity
+////        val isBiometricReady = biometricPrompt?.isBiometricReadyForFaceId(this)
+////
+////
+////        if (isBiometricReady!!) {
+////            activity?.let {
+////                biometricPrompt?.showBiometricPrompt(
+////                    title = "Biometric Authentication",
+////                    subtitle = "Enter biometric credentials to proceed.",
+////                    description = "Scan your face to authenticate.",
+////                    activity = it,
+//////                    listener = biometricAuthListener,
+////                    listener = this,
+////                    cryptoObject = null,
+////                    allowDeviceCredential = false
+////                )
+////            }
+////        } else {
+////            // ไม่สนับสนุนการรับรองความถูกต้องด้วยใบหน้าหรือเกิดข้อผิดพลาด
+////            Toast.makeText(this, "Face biometric authentication is not supported.", Toast.LENGTH_SHORT).show()
+////        }
 //
+//        val isFaceSupported = biometricPrompt?.hasFaceCapability(applicationContext)
+//        if (isFaceSupported!!) {
+//            // อุปกรณ์รองรับการสแกนใบหน้า
+//            Toast.makeText(this, "อุปกรณ์รองรับการสแกนใบหน้า", Toast.LENGTH_SHORT).show()
+//            biometricPrompt?.showFaceBiometricPrompt(this,this)
 //
-//        if (isBiometricReady!!) {
-//            activity?.let {
-//                biometricPrompt?.showBiometricPrompt(
-//                    title = "Biometric Authentication",
-//                    subtitle = "Enter biometric credentials to proceed.",
-//                    description = "Scan your face to authenticate.",
-//                    activity = it,
-////                    listener = biometricAuthListener,
-//                    listener = this,
-//                    cryptoObject = null,
-//                    allowDeviceCredential = false
-//                )
-//            }
 //        } else {
-//            // ไม่สนับสนุนการรับรองความถูกต้องด้วยใบหน้าหรือเกิดข้อผิดพลาด
-//            Toast.makeText(this, "Face biometric authentication is not supported.", Toast.LENGTH_SHORT).show()
+//            // อุปกรณ์ไม่รองรับการสแกนใบหน้าหรือมีความสามารถในการสแกนใบหน้าที่อ่อนแอ
+//            Toast.makeText(this, "อุปกรณ์ไม่รองรับการสแกนใบหน้าหรือมีความสามารถในการสแกนใบหน้าที่อ่อนแอ", Toast.LENGTH_SHORT).show()
 //        }
-
-        val isFaceSupported = biometricPrompt?.hasFaceCapability(applicationContext)
-        if (isFaceSupported!!) {
-            // อุปกรณ์รองรับการสแกนใบหน้า
-            Toast.makeText(this, "อุปกรณ์รองรับการสแกนใบหน้า", Toast.LENGTH_SHORT).show()
-            biometricPrompt?.showFaceBiometricPrompt(this,this)
-
-        } else {
-            // อุปกรณ์ไม่รองรับการสแกนใบหน้าหรือมีความสามารถในการสแกนใบหน้าที่อ่อนแอ
-            Toast.makeText(this, "อุปกรณ์ไม่รองรับการสแกนใบหน้าหรือมีความสามารถในการสแกนใบหน้าที่อ่อนแอ", Toast.LENGTH_SHORT).show()
-        }
-
-
-    }
+//
+//
+//    }
 
     private fun observeViewModel() {
         lifecycleScope.launch {
@@ -165,6 +199,12 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(), BiometricAuthListene
                     }
                     is MainState.ConfigApp -> {
                         loadingDialog.isDismiss()
+//                        binding.tvUrl.text = remoteConfigViewModel.configURL.value.toString()
+//                        remoteConfigViewModel.config.observe(this@LoginActivity) { url ->
+//                            binding.tvUrl.text = url.host
+//                            Toast.makeText(this@LoginActivity, url.host, Toast.LENGTH_SHORT).show()
+//                        }
+//                        binding.tvUrl.text = ConnProperties.URL_Register
 //                        binding.tvNameApp.text = it.configApp[0]!!.AppName
                         binding.tvNameApp.text = it.configApp?.AppName
 //                        binding.tvNameApp.text = it.configApp.body()?.AppName
@@ -187,9 +227,41 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(), BiometricAuthListene
         }
 
         binding.btnRegister.setOnClickListener {
+//            biometricPrompt.authenticate(promptInfo)
+//            initBio()
+            val i = Intent(applicationContext, TermAndConditionActivity::class.java)
+            startActivity(i)
+            finish()
 
         }
 
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun initBio() {
+
+        val biometricManager = BiometricManager.from(this)
+        val canAuthenticate = biometricManager.canAuthenticate()
+
+        if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+            //
+            Toast.makeText(this, "เครื่องของคุณรองรับและเปิดใช้งานการสแกนหน้า", Toast.LENGTH_SHORT).show()
+
+//            val intent = Intent(Settings.ACTION_BIOMETRIC_ENROLL)
+//            startActivity(intent)
+
+            ActivityCompat.startActivity(
+                this,
+                Intent(Settings.ACTION_SECURITY_SETTINGS),
+                null
+            )
+
+
+        } else {
+            // เครื่องของคุณไม่รองรับการสแกนหน้าหรือยังไม่ได้เปิดใช้งาน
+            Toast.makeText(this, "เครื่องของคุณไม่รองรับการสแกนหน้าหรือยังไม่ได้เปิดใช้งาน", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun checkInputLogin() {
@@ -201,7 +273,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(), BiometricAuthListene
                 mainViewModel.userIntent.send(MainIntent.FetchConfigApp)
             }
             sharedPref.createLoginSession(username, password)
-            val i = Intent(applicationContext, MainActivity::class.java)
+            val i = Intent(applicationContext, TermAndConditionActivity::class.java)
             startActivity(i)
             finish()
         } else if (username.trim().isEmpty() && password.trim().isNotEmpty()) {
@@ -235,18 +307,33 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(), BiometricAuthListene
         }
     }
 
-    override fun onBiometricAuthenticationSuccess(result: BiometricPrompt.AuthenticationResult) {
-        Toast.makeText(this, "BiometricAuthenticationSuccess", Toast.LENGTH_SHORT).show()
-    }
+//    override fun onBiometricAuthenticationSuccess(result: BiometricPrompt.AuthenticationResult) {
+//        Toast.makeText(this, "BiometricAuthenticationSuccess", Toast.LENGTH_SHORT).show()
+//    }
+//
+//    override fun onBiometricAuthenticationError(errorCode: Int, errorMessage: String) {}
+//
+//    override fun onBiometricAuthenticationFailed() {
+//        countFailScanBio++
+//        if (countFailScanBio == 3) {
+//            biometricPrompt?.dimissBiometric()
+//            countFailScanBio = 0
+//        }
+//    }
 
-    override fun onBiometricAuthenticationError(errorCode: Int, errorMessage: String) {}
+    fun isInternetConnected(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    override fun onBiometricAuthenticationFailed() {
-        countFailScanBio++
-        if (countFailScanBio == 3) {
-            biometricPrompt?.dimissBiometric()
-            countFailScanBio = 0
+        // ตรวจสอบสำหรับ Android versions ที่ต่ำกว่า Marshmallow (API level 23)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            val networkInfo = connectivityManager.activeNetworkInfo
+            return networkInfo != null && networkInfo.isConnected
         }
+
+        // ตรวจสอบสำหรับ Android Marshmallow (API level 23) และสูงกว่า
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+        return networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
 }

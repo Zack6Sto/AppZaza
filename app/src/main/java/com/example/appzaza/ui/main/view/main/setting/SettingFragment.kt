@@ -70,13 +70,13 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 //        binding.recyclerView.adapter = adapter
     val dataMenu: MutableList<MenuModel> = ArrayList()
     dataMenu.add(MenuModel(com.example.appzaza.R.drawable.logo_boon,"menu 1"))
-    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.luffy,"menu 2"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.setting_icon,"menu 2"))
     dataMenu.add(MenuModel(com.example.appzaza.R.drawable.solo,"menu 3"))
     dataMenu.add(MenuModel(com.example.appzaza.R.drawable.solo,"menu 4"))
-    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.luffy,"menu 5"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.setting_icon,"menu 5"))
     dataMenu.add(MenuModel(com.example.appzaza.R.drawable.logo_boon,"menu 6"))
     dataMenu.add(MenuModel(com.example.appzaza.R.drawable.logo_boon,"menu 7"))
-    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.luffy,"menu 8"))
+    dataMenu.add(MenuModel(com.example.appzaza.R.drawable.setting_icon,"menu 8"))
     dataMenu.add(MenuModel(com.example.appzaza.R.drawable.solo,"menu 9"))
 
 

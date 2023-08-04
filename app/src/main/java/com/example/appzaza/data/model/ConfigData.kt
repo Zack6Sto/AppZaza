@@ -13,3 +13,6 @@ data class RSS(
     val index: String,
     val link: List<String>
 )
+data class Config(
+    var host : String = "11.22.33.44"
+)
